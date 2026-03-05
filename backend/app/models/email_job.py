@@ -1,0 +1,72 @@
+import enum
+import uuid
+from datetime import datetime
+
+from sqlalchemy import DateTime, Enum, ForeignKey, Integer, String, Text, func
+from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.database import Base
+
+
+class EmailJobStatus(str, enum.Enum):
+    queued = "queued"
+    sent = "sent"
+    failed = "failed"
+
+
+class EmailJob(Base):
+    __tablename__ = "email_jobs"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    contact_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("contacts.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    template_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("templates.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    status: Mapped[EmailJobStatus] = mapped_column(
+        Enum(EmailJobStatus, name="email_job_status_enum"),
+        nullable=False,
+        default=EmailJobStatus.queued,
+        index=True,
+    )
+    # Idempotency key: hash of (user_id + contact_id + template_id + date)
+    idempotency_key: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    provider_message_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    last_error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+    # Relationships
+    user: Mapped["User"] = relationship("User", back_populates="email_jobs")  # noqa: F821
+    contact: Mapped["Contact"] = relationship(  # noqa: F821
+        "Contact", back_populates="email_jobs"
+    )
+    template: Mapped["Template | None"] = relationship(  # noqa: F821
+        "Template", back_populates="email_jobs"
+    )
+
+    def __repr__(self) -> str:
+        return f"<EmailJob id={self.id} status={self.status}>"

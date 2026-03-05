@@ -1,0 +1,749 @@
+openapi: 3.1.0
+info:
+  title: NetworkHub API
+  description: |
+    MVP API for the NetworkHub networking app.
+    Supports business card scanning, contact management, and follow-up emails.
+  version: 0.1.0
+  contact:
+    name: NetworkHub Team
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development
+  - url: https://api.networkhub.app/api/v1
+    description: Production
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # ── Auth ──────────────────────────────────────────────────────────────────
+    MagicLinkRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+
+    MagicLinkVerify:
+      type: object
+      required: [token]
+      properties:
+        token:
+          type: string
+
+    TokenResponse:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: bearer
+        user:
+          $ref: '#/components/schemas/User'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
+        signature:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    UserUpdate:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        signature:
+          type: string
+
+    # ── Contacts ──────────────────────────────────────────────────────────────
+    ContactCreate:
+      type: object
+      required: [first_name]
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        company:
+          type: string
+        title:
+          type: string
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+        phones:
+          type: array
+          items:
+            type: string
+        website:
+          type: string
+        address:
+          type: string
+        notes:
+          type: string
+        device_contact_id:
+          type: string
+        source:
+          type: string
+          enum: [scan, manual, import]
+          default: scan
+        tags:
+          type: array
+          items:
+            type: string
+          maxItems: 5
+        event_id:
+          type: string
+          format: uuid
+        consent_email:
+          type: boolean
+          default: false
+
+    ContactResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+        last_name:
+          type: string
+        company:
+          type: string
+        title:
+          type: string
+        emails:
+          type: array
+          items:
+            type: string
+        phones:
+          type: array
+          items:
+            type: string
+        website:
+          type: string
+        address:
+          type: string
+        notes:
+          type: string
+        device_contact_id:
+          type: string
+        source:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    ContactList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactResponse'
+        total:
+          type: integer
+        page:
+          type: integer
+        page_size:
+          type: integer
+
+    ContactUpdate:
+      type: object
+      properties:
+        first_name:
+          type: string
+        last_name:
+          type: string
+        company:
+          type: string
+        title:
+          type: string
+        emails:
+          type: array
+          items:
+            type: string
+        phones:
+          type: array
+          items:
+            type: string
+        website:
+          type: string
+        address:
+          type: string
+        notes:
+          type: string
+        device_contact_id:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    # ── Events ────────────────────────────────────────────────────────────────
+    EventCreate:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        location:
+          type: string
+        event_date:
+          type: string
+          format: date
+
+    EventResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        location:
+          type: string
+        event_date:
+          type: string
+          format: date
+        created_at:
+          type: string
+          format: date-time
+
+    # ── Templates ─────────────────────────────────────────────────────────────
+    TemplateCreate:
+      type: object
+      required: [name, subject, body]
+      properties:
+        name:
+          type: string
+        subject:
+          type: string
+          description: Jinja2 template string. Variables: event_name, first_name, my_name, my_signature
+        body:
+          type: string
+          description: Jinja2 template string.
+        is_default:
+          type: boolean
+          default: false
+
+    TemplateUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        subject:
+          type: string
+        body:
+          type: string
+        is_default:
+          type: boolean
+
+    TemplateResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        subject:
+          type: string
+        body:
+          type: string
+        is_default:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    # ── Email Jobs ────────────────────────────────────────────────────────────
+    SendEmailRequest:
+      type: object
+      properties:
+        template_id:
+          type: string
+          format: uuid
+          description: If omitted, uses user's default template
+        event_id:
+          type: string
+          format: uuid
+        custom_subject:
+          type: string
+          description: Override template subject
+        custom_body:
+          type: string
+          description: Override template body
+
+    EmailJobResponse:
+      type: object
+      properties:
+        job_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [queued, sent, failed]
+        contact_id:
+          type: string
+          format: uuid
+        attempts:
+          type: integer
+        last_error:
+          type: string
+        provider_message_id:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    # ── Profile Discovery ─────────────────────────────────────────────────────
+    ProfileSuggestion:
+      type: object
+      properties:
+        platform:
+          type: string
+          enum: [linkedin, instagram, twitter, github]
+        url:
+          type: string
+          format: uri
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        display_name:
+          type: string
+
+    ProfileDiscoveryResponse:
+      type: object
+      properties:
+        contact_id:
+          type: string
+          format: uuid
+        suggestions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProfileSuggestion'
+
+    # ── Errors ────────────────────────────────────────────────────────────────
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+        code:
+          type: string
+
+paths:
+  # ── Health ─────────────────────────────────────────────────────────────────
+  /health:
+    get:
+      summary: Health check
+      security: []
+      tags: [System]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+  # ── Auth ───────────────────────────────────────────────────────────────────
+  /auth/request_magic_link:
+    post:
+      summary: Request a magic link via email
+      security: []
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MagicLinkRequest'
+      responses:
+        '200':
+          description: Magic link sent (always returns 200 to prevent email enumeration)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: If that email is registered, a magic link has been sent.
+
+  /auth/verify_magic_link:
+    post:
+      summary: Verify magic link token and get JWT
+      security: []
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MagicLinkVerify'
+      responses:
+        '200':
+          description: JWT token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: Invalid or expired token
+
+  /me:
+    get:
+      summary: Get current user profile
+      tags: [Auth]
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    patch:
+      summary: Update current user profile
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        '200':
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  # ── Contacts ───────────────────────────────────────────────────────────────
+  /contacts:
+    post:
+      summary: Create a new contact
+      tags: [Contacts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactCreate'
+      responses:
+        '201':
+          description: Contact created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactResponse'
+    get:
+      summary: List contacts with search and pagination
+      tags: [Contacts]
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Search by name or company
+        - name: tag
+          in: query
+          schema:
+            type: string
+        - name: event_id
+          in: query
+          schema:
+            type: string
+            format: uuid
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+      responses:
+        '200':
+          description: Contact list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactList'
+
+  /contacts/{id}:
+    get:
+      summary: Get contact by ID
+      tags: [Contacts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Contact detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactResponse'
+        '404':
+          description: Not found
+    patch:
+      summary: Update contact
+      tags: [Contacts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactUpdate'
+      responses:
+        '200':
+          description: Updated contact
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactResponse'
+
+  /contacts/{id}/send_email:
+    post:
+      summary: Queue a follow-up email to a contact
+      tags: [Contacts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEmailRequest'
+      responses:
+        '202':
+          description: Email queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailJobResponse'
+        '400':
+          description: No email address / consent not given / daily limit exceeded
+        '404':
+          description: Contact not found
+
+  /contacts/{id}/discover_profiles:
+    post:
+      summary: Discover probable social profiles for a contact (MVP+)
+      tags: [Contacts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Profile suggestions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileDiscoveryResponse'
+
+  # ── Events ─────────────────────────────────────────────────────────────────
+  /events:
+    post:
+      summary: Create an event
+      tags: [Events]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventCreate'
+      responses:
+        '201':
+          description: Event created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventResponse'
+    get:
+      summary: List events
+      tags: [Events]
+      responses:
+        '200':
+          description: Events list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventResponse'
+
+  # ── Templates ──────────────────────────────────────────────────────────────
+  /templates:
+    get:
+      summary: List email templates
+      tags: [Templates]
+      responses:
+        '200':
+          description: Templates list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TemplateResponse'
+    post:
+      summary: Create email template
+      tags: [Templates]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplateCreate'
+      responses:
+        '201':
+          description: Template created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponse'
+
+  /templates/{id}:
+    patch:
+      summary: Update email template
+      tags: [Templates]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TemplateUpdate'
+      responses:
+        '200':
+          description: Updated template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateResponse'
+
+  /templates/{id}/set_default:
+    post:
+      summary: Set template as default
+      tags: [Templates]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Template set as default
+
+  # ── Jobs ───────────────────────────────────────────────────────────────────
+  /jobs/{job_id}:
+    get:
+      summary: Get email job status
+      tags: [Jobs]
+      parameters:
+        - name: job_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Job status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailJobResponse'
+        '404':
+          description: Job not found

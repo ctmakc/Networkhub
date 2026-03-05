@@ -1,0 +1,64 @@
+name: networkhub
+description: Business card scanner and networking follow-up app
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # State management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.5
+  # Navigation
+  go_router: ^13.2.4
+  # HTTP
+  dio: ^5.4.3
+  # Local storage
+  shared_preferences: ^2.2.3
+  hive_flutter: ^1.1.0
+  hive: ^2.2.3
+  # OCR
+  google_mlkit_text_recognition: ^0.13.0
+  # Camera
+  camera: ^0.10.5+9
+  image_picker: ^1.0.7
+  # Contacts
+  flutter_contacts: ^1.1.7+1
+  # QR / vCard
+  mobile_scanner: ^5.1.1
+  # UI
+  cupertino_icons: ^1.0.6
+  gap: ^3.0.1
+  # Connectivity
+  connectivity_plus: ^6.0.3
+  # URL launcher
+  url_launcher: ^6.2.5
+  # Form validation
+  formz: ^0.7.0
+  # JSON
+  json_annotation: ^4.9.0
+  freezed_annotation: ^2.4.1
+  # Logging
+  logger: ^2.3.0
+  # Env
+  flutter_dotenv: ^5.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  build_runner: ^2.4.9
+  riverpod_generator: ^2.4.0
+  freezed: ^2.5.2
+  json_serializable: ^6.7.1
+  hive_generator: ^2.0.1
+  mocktail: ^1.0.3
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - .env

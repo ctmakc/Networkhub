@@ -1,0 +1,74 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "networkhub-backend"
+version = "0.1.0"
+description = "NetworkHub MVP backend API"
+requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "Proprietary" }
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | build
+  | dist
+  | alembic/versions
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+known_first_party = ["app"]
+known_third_party = ["fastapi", "sqlalchemy", "pydantic", "celery", "redis", "structlog"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+env = [
+    "ENVIRONMENT=test",
+    "DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/networkhub_test",
+    "REDIS_URL=redis://localhost:6379/1",
+    "SECRET_KEY=test-secret-key-for-testing-only-32chars",
+    "SENDGRID_API_KEY=SG.test",
+    "EMAIL_FROM=test@example.com",
+    "EMAIL_FROM_NAME=NetworkHub Test",
+]
+
+[tool.mypy]
+python_version = "3.11"
+strict = false
+ignore_missing_imports = true
+exclude = ["alembic/"]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/tests/*", "alembic/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
