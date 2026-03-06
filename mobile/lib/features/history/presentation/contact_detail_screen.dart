@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
 import 'package:networkhub/features/cloud_sync/data/contact_models.dart';
 import 'package:networkhub/features/history/providers/history_provider.dart';
 import 'package:networkhub/features/messaging/presentation/email_preview_screen.dart';
-import 'package:networkhub/shared/widgets/error_snackbar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ContactDetailScreen extends ConsumerWidget {

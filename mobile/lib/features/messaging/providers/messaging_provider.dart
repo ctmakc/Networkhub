@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:networkhub/features/cloud_sync/data/contact_models.dart';
 import 'package:networkhub/features/cloud_sync/data/contacts_repository.dart';
-import 'package:networkhub/features/cloud_sync/data/templates_repository.dart';
 
 enum MessagingStatus { idle, sending, sent, error }
 
@@ -44,16 +43,13 @@ final messagingProvider =
     StateNotifierProvider.autoDispose<MessagingNotifier, MessagingState>(
   (ref) => MessagingNotifier(
     ref.read(contactsRepositoryProvider),
-    ref.read(templatesRepositoryProvider),
   ),
 );
 
 class MessagingNotifier extends StateNotifier<MessagingState> {
   final ContactsRepository _contactsRepo;
-  final TemplatesRepository _templatesRepo;
 
-  MessagingNotifier(this._contactsRepo, this._templatesRepo)
-      : super(const MessagingState());
+  MessagingNotifier(this._contactsRepo) : super(const MessagingState());
 
   void setTemplate(Template template) {
     state = state.copyWith(selectedTemplate: template);

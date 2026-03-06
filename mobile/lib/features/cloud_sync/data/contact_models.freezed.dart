@@ -859,3 +859,11 @@ abstract class _ProfileDiscovery implements ProfileDiscovery {
   @override String? get linkedinUrl; @override String? get twitterHandle; @override String? get githubUsername; @override String? get bio; @override String? get photoUrl; @override DateTime? get lastUpdated;
   @override @JsonKey(ignore: true) _$$ProfileDiscoveryImplCopyWith<_$ProfileDiscoveryImpl> get copyWith => throw _privateConstructorUsedError;
 }
+
+// JSON helpers redirecting to generated implementations
+Contact _$ContactFromJson(Map<String, dynamic> json) => _$$ContactImplFromJson(json);
+Interaction _$InteractionFromJson(Map<String, dynamic> json) => _$$InteractionImplFromJson(json);
+Event _$EventFromJson(Map<String, dynamic> json) => _$$EventImplFromJson(json);
+Template _$TemplateFromJson(Map<String, dynamic> json) => _$$TemplateImplFromJson(json);
+EmailJob _$EmailJobFromJson(Map<String, dynamic> json) => _$$EmailJobImplFromJson(json);
+ProfileDiscovery _$ProfileDiscoveryFromJson(Map<String, dynamic> json) => _$$ProfileDiscoveryImplFromJson(json);

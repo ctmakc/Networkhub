@@ -174,7 +174,6 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   @override
   Widget build(BuildContext context) {
     final reviewState = ref.watch(reviewProvider);
-    final theme = Theme.of(context);
 
     ref.listen<ReviewState>(reviewProvider, (prev, next) {
       if (next.status == ReviewStatus.error && next.errorMessage != null) {
@@ -505,7 +504,7 @@ class _EventSelector extends ConsumerWidget {
             color: theme.colorScheme.outline.withOpacity(0.3),
           ),
           borderRadius: BorderRadius.circular(12),
-          color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+          color: theme.colorScheme.surfaceVariant.withOpacity(0.5),
         ),
         child: Row(
           children: [

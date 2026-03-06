@@ -1,6 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:networkhub/features/cloud_sync/data/contact_models.dart';
-import 'package:networkhub/features/cloud_sync/data/contacts_repository.dart';
 import 'package:networkhub/features/cloud_sync/sync_service.dart';
 import 'package:networkhub/features/device_contacts/device_contacts_service.dart';
 import 'package:networkhub/features/scan/data/scan_models.dart';
@@ -41,19 +39,16 @@ class ReviewState {
 final reviewProvider =
     StateNotifierProvider.autoDispose<ReviewNotifier, ReviewState>(
   (ref) => ReviewNotifier(
-    ref.read(contactsRepositoryProvider),
     ref.read(syncServiceProvider),
     ref.read(deviceContactsServiceProvider),
   ),
 );
 
 class ReviewNotifier extends StateNotifier<ReviewState> {
-  final ContactsRepository _contactsRepo;
   final SyncService _syncService;
   final DeviceContactsService _deviceContactsService;
 
   ReviewNotifier(
-    this._contactsRepo,
     this._syncService,
     this._deviceContactsService,
   ) : super(ReviewState(draft: const DraftContact()));

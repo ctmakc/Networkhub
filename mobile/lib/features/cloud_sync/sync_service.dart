@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:logger/logger.dart';
 import 'package:networkhub/core/error/app_exception.dart';
 import 'package:networkhub/core/providers/connectivity_provider.dart';
@@ -8,7 +10,6 @@ import 'package:networkhub/core/storage/offline_queue.dart';
 import 'package:networkhub/features/cloud_sync/data/contact_models.dart';
 import 'package:networkhub/features/cloud_sync/data/contacts_repository.dart';
 import 'package:networkhub/features/scan/data/scan_models.dart';
-import 'package:uuid/uuid.dart';
 
 final syncServiceProvider = Provider<SyncService>((ref) {
   return SyncService(
@@ -60,8 +61,8 @@ class SyncService {
     }
 
     // Save to offline queue
-    const uuid = Uuid();
-    final contactDraft = draft.toContactDraft(uuid.v4());
+    final id = '${DateTime.now().microsecondsSinceEpoch}_${Random.secure().nextInt(1000000)}';
+    final contactDraft = draft.toContactDraft(id);
     await _queue.enqueue(contactDraft);
 
     // Return a placeholder contact for UI purposes

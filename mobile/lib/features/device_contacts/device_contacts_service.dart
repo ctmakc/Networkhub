@@ -141,19 +141,19 @@ class DeviceContactsService {
       newPhones.add(Phone(draft.phone!));
     }
 
-    final updated = existing.copyWith(
-      name: updatedName,
-      emails: newEmails,
-      phones: newPhones,
-      organizations: (draft.company != null || draft.title != null)
-          ? [
-              Organization(
-                company: draft.company ?? existing.organizations.firstOrNull?.company ?? '',
-                title: draft.title ?? existing.organizations.firstOrNull?.title ?? '',
-              )
-            ]
-          : existing.organizations,
-    );
+    final newOrgs = (draft.company != null || draft.title != null)
+        ? [
+            Organization(
+              company: draft.company ?? existing.organizations.firstOrNull?.company ?? '',
+              title: draft.title ?? existing.organizations.firstOrNull?.title ?? '',
+            )
+          ]
+        : existing.organizations;
+    existing.name = updatedName;
+    existing.emails = newEmails;
+    existing.phones = newPhones;
+    existing.organizations = newOrgs;
+    final updated = existing;
 
     try {
       await FlutterContacts.updateContact(updated);

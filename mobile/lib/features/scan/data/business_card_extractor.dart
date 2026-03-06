@@ -128,7 +128,6 @@ class BusinessCardExtractor {
   }
 
   static String? _extractWebsite(String text, String? email) {
-    final linkedinMatch = _linkedinRegex.firstMatch(text);
     final emailDomain = email != null ? email.split('@').last : null;
 
     final matches = _websiteRegex.allMatches(text);

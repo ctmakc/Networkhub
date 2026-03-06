@@ -85,7 +85,7 @@ def upgrade() -> None:
         sa.Column("device_contact_id", sa.String(255), nullable=True),
         sa.Column(
             "source",
-            sa.Enum("scan", "manual", "import", name="contact_source_enum", create_constraint=False),
+            postgresql.ENUM("scan", "manual", "import", name="contact_source_enum", create_type=False),
             nullable=False,
             server_default="'manual'",
         ),
@@ -115,7 +115,7 @@ def upgrade() -> None:
         sa.Column("event_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("events.id", ondelete="SET NULL"), nullable=True),
         sa.Column(
             "type",
-            sa.Enum("met", "email_sent", "email_failed", "note_added", name="interaction_type_enum", create_constraint=False),
+            postgresql.ENUM("met", "email_sent", "email_failed", "note_added", name="interaction_type_enum", create_type=False),
             nullable=False,
         ),
         sa.Column("payload", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
@@ -131,12 +131,12 @@ def upgrade() -> None:
         sa.Column("user_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
         sa.Column(
             "type",
-            sa.Enum("email_marketing", "data_processing", "terms_of_service", name="consent_type_enum", create_constraint=False),
+            postgresql.ENUM("email_marketing", "data_processing", "terms_of_service", name="consent_type_enum", create_type=False),
             nullable=False,
         ),
         sa.Column(
             "status",
-            sa.Enum("granted", "revoked", name="consent_status_enum", create_constraint=False),
+            postgresql.ENUM("granted", "revoked", name="consent_status_enum", create_type=False),
             nullable=False,
             server_default="'granted'",
         ),
@@ -157,7 +157,7 @@ def upgrade() -> None:
         sa.Column("template_id", postgresql.UUID(as_uuid=True), sa.ForeignKey("templates.id", ondelete="SET NULL"), nullable=True),
         sa.Column(
             "status",
-            sa.Enum("queued", "sent", "failed", name="email_job_status_enum", create_constraint=False),
+            postgresql.ENUM("queued", "sent", "failed", name="email_job_status_enum", create_type=False),
             nullable=False,
             server_default="'queued'",
         ),

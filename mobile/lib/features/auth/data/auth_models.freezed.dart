@@ -636,3 +636,9 @@ abstract class _VerifyMagicLinkRequest implements VerifyMagicLinkRequest {
   _$$VerifyMagicLinkRequestImplCopyWith<_$VerifyMagicLinkRequestImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
+
+// JSON helpers redirecting to generated implementations
+User _$UserFromJson(Map<String, dynamic> json) => _$$UserImplFromJson(json);
+TokenResponse _$TokenResponseFromJson(Map<String, dynamic> json) => _$$TokenResponseImplFromJson(json);
+MagicLinkRequest _$MagicLinkRequestFromJson(Map<String, dynamic> json) => _$$MagicLinkRequestImplFromJson(json);
+VerifyMagicLinkRequest _$VerifyMagicLinkRequestFromJson(Map<String, dynamic> json) => _$$VerifyMagicLinkRequestImplFromJson(json);

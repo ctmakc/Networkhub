@@ -60,7 +60,7 @@ class VCardParser {
         }
       } else if (key == 'TITLE' || key.startsWith('TITLE;')) {
         title = _decodeValue(value).trim();
-        if (title!.isEmpty) title = null;
+        if (title.isEmpty) title = null;
       } else if (key.startsWith('URL') || key == 'URL') {
         final decoded = _decodeValue(value).trim();
         if (decoded.isNotEmpty && website == null) {
@@ -74,7 +74,7 @@ class VCardParser {
         }
       } else if (key == 'NOTE' || key.startsWith('NOTE;')) {
         notes = _decodeValue(value).trim();
-        if (notes!.isEmpty) notes = null;
+        if (notes.isEmpty) notes = null;
       }
     }
 

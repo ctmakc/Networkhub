@@ -23,7 +23,7 @@ class EmailConsentToggle extends StatelessWidget {
       decoration: BoxDecoration(
         color: value
             ? theme.colorScheme.primaryContainer.withOpacity(0.3)
-            : theme.colorScheme.surfaceContainerHighest.withOpacity(0.5),
+            : theme.colorScheme.surfaceVariant.withOpacity(0.5),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: value
