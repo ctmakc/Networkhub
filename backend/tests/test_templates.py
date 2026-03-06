@@ -47,7 +47,7 @@ async def test_set_default_template(client: AsyncClient, auth_headers: dict) -> 
         json={"name": "Template A", "subject": "Subj A", "body": "Body A", "is_default": True},
         headers=auth_headers,
     )
-    t1_id = r1.json()["id"]
+    r1.json()["id"]
 
     r2 = await client.post(
         "/api/v1/templates",

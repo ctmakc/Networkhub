@@ -85,7 +85,11 @@ class EmailService:
             user.id, contact.id, template_id, date.today()
         )
 
-        # Optimistic create – let the DB unique constraint handle concurrent duplicates
+        # Pre-check covers the common case (sequential calls, same session)
+        existing = await self.email_job_repo.get_by_idempotency_key(idempotency_key)
+        if existing is not None:
+            return existing
+
         job = EmailJob(
             user_id=user.id,
             contact_id=contact.id,
@@ -95,10 +99,12 @@ class EmailService:
             attempts=0,
         )
         try:
-            job = await self.email_job_repo.create(job)
+            # Use a SAVEPOINT so a concurrent duplicate only rolls back the
+            # nested transaction – the outer session stays intact.
+            async with self.email_job_repo.db.begin_nested():
+                job = await self.email_job_repo.create(job)
         except IntegrityError:
-            # Concurrent request beat us to it – fetch the existing row
-            await self.email_job_repo.db.rollback()
+            # Race condition: another process inserted between pre-check and create
             existing = await self.email_job_repo.get_by_idempotency_key(idempotency_key)
             if existing is not None:
                 return existing

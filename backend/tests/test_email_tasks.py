@@ -1,7 +1,7 @@
 """Tests for email task logic with mocked email provider."""
 
 import uuid
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -14,7 +14,6 @@ async def test_queue_email_creates_job(db_session, test_user) -> None:
     """EmailService.queue_email should create an EmailJob record."""
     from app.models.contact import Contact, ContactSource
     from app.domain.services.email_service import EmailService
-    from app.repositories.contact_repository import ContactRepository
     from app.repositories.email_job_repository import EmailJobRepository
     from app.repositories.interaction_repository import InteractionRepository
     from app.repositories.template_repository import TemplateRepository
@@ -62,7 +61,6 @@ async def test_queue_email_idempotency(db_session, test_user) -> None:
     """Calling queue_email twice with the same params should return the same job."""
     from app.models.contact import Contact, ContactSource
     from app.domain.services.email_service import EmailService
-    from app.repositories.contact_repository import ContactRepository
     from app.repositories.email_job_repository import EmailJobRepository
     from app.repositories.interaction_repository import InteractionRepository
     from app.repositories.template_repository import TemplateRepository
@@ -139,7 +137,7 @@ async def test_queue_email_no_email_address_raises(db_session, test_user) -> Non
 def test_sendgrid_provider_handles_exception() -> None:
     """SendGridProvider.send should return a failed SendResult on exception."""
     import asyncio
-    from app.providers.email_provider import EmailMessage, SendGridProvider
+    from app.providers.email_provider import SendGridProvider
 
     provider = SendGridProvider(api_key="SG.fake")
     message = EmailMessage(
@@ -152,7 +150,7 @@ def test_sendgrid_provider_handles_exception() -> None:
     )
 
     # sendgrid import will fail with a fake key; we just check it returns a result
-    result = asyncio.get_event_loop().run_until_complete(provider.send(message))
+    result = asyncio.run(provider.send(message))
     assert isinstance(result, SendResult)
     # Either success (unlikely in test) or failure with an error message
     if not result.success:
@@ -165,7 +163,7 @@ def test_stub_ocr_provider() -> None:
     from app.providers.ocr_provider import StubOCRProvider
 
     provider = StubOCRProvider()
-    result = asyncio.get_event_loop().run_until_complete(
+    result = asyncio.run(
         provider.extract(b"fake image bytes")
     )
     assert result.confidence == 0.0
@@ -179,7 +177,7 @@ def test_python_normalize_provider() -> None:
     from app.schemas.enrichment import EnrichRequest
 
     provider = PythonNormalizeProvider()
-    result = asyncio.get_event_loop().run_until_complete(
+    result = asyncio.run(
         provider.enrich(EnrichRequest(full_name="John Doe", company="Acme"))
     )
     assert result.first_name == "John"

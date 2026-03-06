@@ -1,15 +1,14 @@
 from collections.abc import AsyncGenerator
 from typing import Any
 
-from sqlalchemy import event, text
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
     async_sessionmaker,
     create_async_engine,
 )
-from sqlalchemy.orm import DeclarativeBase, MappedColumn
-from sqlalchemy.pool import NullPool
+from sqlalchemy.orm import DeclarativeBase
 
 from app.config import settings
 
