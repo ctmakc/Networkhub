@@ -41,18 +41,8 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 filterwarnings = [
-    "error",
     "ignore::DeprecationWarning",
     "ignore::PendingDeprecationWarning",
-]
-env = [
-    "ENVIRONMENT=test",
-    "DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/networkhub_test",
-    "REDIS_URL=redis://localhost:6379/1",
-    "SECRET_KEY=test-secret-key-for-testing-only-32chars",
-    "SENDGRID_API_KEY=SG.test",
-    "EMAIL_FROM=test@example.com",
-    "EMAIL_FROM_NAME=NetworkHub Test",
 ]
 
 [tool.mypy]
