@@ -52,6 +52,8 @@ class ContactService:
             payload={"source": data.source.value},
         )
 
+        # Re-fetch with tags eagerly loaded so serialization doesn't trigger lazy IO
+        contact = await self.contact_repo.get_with_tags(contact.id)
         return contact
 
     async def get(self, user_id: uuid.UUID, contact_id: uuid.UUID) -> Optional[Contact]:
