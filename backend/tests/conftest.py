@@ -5,20 +5,20 @@ from typing import AsyncGenerator
 
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.pool import NullPool
 
 from app.config import settings
 from app.database import Base, get_db
 from app.main import app
 
-# Use a test database URL (override via environment or derive from the configured URL)
 TEST_DATABASE_URL = settings.DATABASE_URL
 
 
-@pytest_asyncio.fixture(scope="session")
+@pytest_asyncio.fixture(scope="function")
 async def engine():
     """Create test database engine and set up schema."""
-    eng = create_async_engine(TEST_DATABASE_URL, echo=False)
+    eng = create_async_engine(TEST_DATABASE_URL, echo=False, poolclass=NullPool)
     async with eng.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield eng
@@ -30,13 +30,10 @@ async def engine():
 @pytest_asyncio.fixture
 async def db_session(engine) -> AsyncGenerator[AsyncSession, None]:
     """Provide a test database session that rolls back after each test."""
-    session_factory = async_sessionmaker(
-        engine, expire_on_commit=False, class_=AsyncSession
-    )
-    async with session_factory() as session:
-        async with session.begin():
-            yield session
-            await session.rollback()
+    async with AsyncSession(engine, expire_on_commit=False) as session:
+        await session.begin()
+        yield session
+        await session.rollback()
 
 
 @pytest_asyncio.fixture
@@ -80,8 +77,6 @@ async def auth_headers(test_user):
     """Return Bearer auth headers for the test user."""
     from app.domain.services.auth_service import AuthService
 
-    # Create a minimal AuthService just to call create_access_token
-    # We don't need a real UserRepository for token creation
     class _MinimalRepo:
         pass
 
