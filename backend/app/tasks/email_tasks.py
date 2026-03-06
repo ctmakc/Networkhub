@@ -41,7 +41,7 @@ def send_followup_email(
     Uses asyncio.run() because SQLAlchemy async sessions are needed inside
     a synchronous Celery worker.
     """
-    return asyncio.get_event_loop().run_until_complete(
+    return asyncio.run(
         _send_followup_email_async(
             self,
             job_id=job_id,

@@ -77,10 +77,9 @@ async def test_user(db_session: AsyncSession):
 
 
 @pytest_asyncio.fixture
-def auth_headers(test_user):
+async def auth_headers(test_user):
     """Return Bearer auth headers for the test user."""
     from app.domain.services.auth_service import AuthService
-    from app.repositories.user_repository import UserRepository
 
     # Create a minimal AuthService just to call create_access_token
     # We don't need a real UserRepository for token creation

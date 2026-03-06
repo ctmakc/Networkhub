@@ -26,7 +26,7 @@ def enrich_contact(self, contact_id: str) -> dict:
     Runs enrichment provider and updates the contact record if new data
     is returned.
     """
-    return asyncio.get_event_loop().run_until_complete(
+    return asyncio.run(
         _enrich_contact_async(self, contact_id)
     )
 

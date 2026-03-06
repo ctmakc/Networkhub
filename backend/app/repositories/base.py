@@ -55,5 +55,5 @@ class BaseRepository(Generic[ModelT]):
 
     async def delete(self, instance: ModelT) -> None:
         """Delete a model instance."""
-        await self.db.delete(instance)
+        self.db.delete(instance)  # sync – no await
         await self.db.flush()

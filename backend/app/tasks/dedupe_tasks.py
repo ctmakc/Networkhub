@@ -29,7 +29,7 @@ def dedupe_suggest(self, user_id: str) -> dict:
     production version would persist suggestions to a database table and
     surface them via the API.
     """
-    return asyncio.get_event_loop().run_until_complete(
+    return asyncio.run(
         _dedupe_suggest_async(self, user_id)
     )
 

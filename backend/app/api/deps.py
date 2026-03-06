@@ -1,6 +1,7 @@
 import uuid
 from typing import Annotated
 
+import structlog
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jose import JWTError, jwt
@@ -10,6 +11,8 @@ from app.config import settings
 from app.database import get_db
 from app.models.user import User
 from app.repositories.user_repository import UserRepository
+
+logger = structlog.get_logger(__name__)
 
 bearer_scheme = HTTPBearer()
 
@@ -30,10 +33,15 @@ async def get_current_user(
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         user_id_str: str | None = payload.get("sub")
         if user_id_str is None:
+            logger.warning("JWT missing 'sub' claim")
             raise credentials_exception
         user_id = uuid.UUID(user_id_str)
-    except (JWTError, ValueError):
-        raise credentials_exception
+    except JWTError as exc:
+        logger.warning("JWT validation failed", error=str(exc))
+        raise credentials_exception from exc
+    except ValueError as exc:
+        logger.warning("JWT 'sub' is not a valid UUID", error=str(exc))
+        raise credentials_exception from exc
 
     repo = UserRepository(db)
     user = await repo.get(user_id)

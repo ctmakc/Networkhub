@@ -3,10 +3,11 @@ import uuid
 from datetime import date
 from typing import Optional
 
+from sqlalchemy.exc import IntegrityError
+
 from app.config import settings
 from app.models.contact import Contact
 from app.models.email_job import EmailJob, EmailJobStatus
-from app.models.interaction import InteractionType
 from app.models.user import User
 from app.repositories.email_job_repository import EmailJobRepository
 from app.repositories.interaction_repository import InteractionRepository
@@ -19,10 +20,6 @@ def _build_idempotency_key(
     template_id: Optional[uuid.UUID],
     today: date,
 ) -> str:
-    """
-    SHA-256 hash of (user_id, contact_id, template_id, date).
-    Prevents duplicate email jobs for the same (user, contact, template, day) combination.
-    """
     raw = f"{user_id}:{contact_id}:{template_id}:{today.isoformat()}"
     return hashlib.sha256(raw.encode()).hexdigest()
 
@@ -60,7 +57,6 @@ class EmailService:
             ValueError: if the daily limit is exceeded, no recipient email found,
                         or template is missing when no override is provided.
         """
-        # Daily rate-limit check
         if not await self.check_daily_limit(user.id):
             raise ValueError(
                 f"Daily email limit of {settings.EMAIL_DAILY_LIMIT} reached. "
@@ -76,23 +72,20 @@ class EmailService:
         if not to_email:
             raise ValueError("Contact has no email address and no recipient_email was supplied.")
 
-        # Validate that we have content
-        if template_id is None and (not subject_override or not body_override):
+        # Validate content (treat empty/whitespace as missing)
+        has_overrides = bool(subject_override and subject_override.strip()) and bool(
+            body_override and body_override.strip()
+        )
+        if template_id is None and not has_overrides:
             raise ValueError(
                 "Either template_id or both subject and body must be provided."
             )
 
-        # Build idempotency key
         idempotency_key = _build_idempotency_key(
             user.id, contact.id, template_id, date.today()
         )
 
-        # Check for existing job with same key (idempotent re-queue)
-        existing = await self.email_job_repo.get_by_idempotency_key(idempotency_key)
-        if existing is not None:
-            return existing
-
-        # Create the job record
+        # Optimistic create – let the DB unique constraint handle concurrent duplicates
         job = EmailJob(
             user_id=user.id,
             contact_id=contact.id,
@@ -101,9 +94,16 @@ class EmailService:
             idempotency_key=idempotency_key,
             attempts=0,
         )
-        job = await self.email_job_repo.create(job)
+        try:
+            job = await self.email_job_repo.create(job)
+        except IntegrityError:
+            # Concurrent request beat us to it – fetch the existing row
+            await self.email_job_repo.db.rollback()
+            existing = await self.email_job_repo.get_by_idempotency_key(idempotency_key)
+            if existing is not None:
+                return existing
+            raise  # truly unexpected
 
-        # Dispatch Celery task (import here to avoid circular imports)
         from app.tasks.email_tasks import send_followup_email
 
         send_followup_email.apply_async(

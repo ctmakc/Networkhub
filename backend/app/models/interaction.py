@@ -44,7 +44,7 @@ class Interaction(Base):
         nullable=False,
     )
     # Arbitrary JSON payload (e.g. email subject, error message, note text)
-    payload: Mapped[dict | None] = mapped_column(JSONB, nullable=True, default=dict)
+    payload: Mapped[dict | None] = mapped_column(JSONB, nullable=True, default=None)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
