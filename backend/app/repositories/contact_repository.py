@@ -1,6 +1,7 @@
 import uuid
 from typing import Optional, Sequence
 
+import sqlalchemy as sa
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -49,7 +50,7 @@ class ContactRepository(BaseRepository[Contact]):
                     func.lower(Contact.first_name).like(term),
                     func.lower(Contact.last_name).like(term),
                     func.lower(Contact.company).like(term),
-                    Contact.emails.cast(type_=None).astext.ilike(f"%{search}%"),
+                    Contact.emails.cast(sa.Text()).ilike(f"%{search}%"),
                 )
             )
 

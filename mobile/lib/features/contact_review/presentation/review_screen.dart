@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:networkhub/features/cloud_sync/data/events_repository.dart';
 import 'package:networkhub/features/contact_review/data/contact_validator.dart';
 import 'package:networkhub/features/contact_review/presentation/widgets/event_picker_widget.dart';
 import 'package:networkhub/features/contact_review/presentation/widgets/tag_input_widget.dart';
