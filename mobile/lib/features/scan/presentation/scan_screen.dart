@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:networkhub/core/providers/connectivity_provider.dart';
 import 'package:networkhub/features/scan/data/scan_models.dart';
 import 'package:networkhub/features/scan/data/vcard_parser.dart';
 import 'package:networkhub/features/scan/providers/scan_provider.dart';
