@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     SENTRY_DSN: Optional[str] = None
     ENVIRONMENT: str = "development"
 
+    # CORS
+    ALLOWED_ORIGINS: str = ""
+
     # Business rules
     EMAIL_DAILY_LIMIT: int = 20
 

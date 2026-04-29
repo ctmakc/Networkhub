@@ -4,6 +4,7 @@ import 'package:gap/gap.dart';
 import 'package:networkhub/features/cloud_sync/data/contact_models.dart';
 import 'package:networkhub/features/history/providers/history_provider.dart';
 import 'package:networkhub/features/messaging/presentation/email_preview_screen.dart';
+import 'package:networkhub/shared/widgets/shimmer_loading.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ContactDetailScreen extends ConsumerWidget {
@@ -37,7 +38,7 @@ class ContactDetailScreen extends ConsumerWidget {
           contact: contact,
           interactionsAsync: interactionsAsync,
         ),
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const ContactDetailShimmer(),
         error: (e, _) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -217,14 +218,17 @@ class _ContactHeader extends StatelessWidget {
 
     return Row(
       children: [
-        CircleAvatar(
-          radius: 36,
-          backgroundColor: theme.colorScheme.primaryContainer,
-          child: Text(
-            initials,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              color: theme.colorScheme.onPrimaryContainer,
-              fontWeight: FontWeight.bold,
+        Hero(
+          tag: 'contact-avatar-${contact.id}',
+          child: CircleAvatar(
+            radius: 36,
+            backgroundColor: theme.colorScheme.primaryContainer,
+            child: Text(
+              initials,
+              style: theme.textTheme.headlineSmall?.copyWith(
+                color: theme.colorScheme.onPrimaryContainer,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),

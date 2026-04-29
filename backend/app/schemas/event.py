@@ -18,6 +18,19 @@ class EventCreate(BaseModel):
         return v.strip()
 
 
+class EventUpdate(BaseModel):
+    name: Optional[str] = None
+    location: Optional[str] = None
+    event_date: Optional[date] = None
+
+    @field_validator("name")
+    @classmethod
+    def name_not_empty(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and not v.strip():
+            raise ValueError("name must not be empty")
+        return v.strip() if v else v
+
+
 class EventResponse(BaseModel):
     model_config = {"from_attributes": True}
 

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:networkhub/features/history/providers/history_provider.dart';
 import 'package:networkhub/shared/widgets/contact_list_tile.dart';
 import 'package:networkhub/shared/widgets/pending_sync_badge.dart';
+import 'package:networkhub/shared/widgets/shimmer_loading.dart';
 
 class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
@@ -121,7 +122,7 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                   ),
                 );
               },
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const ContactListShimmer(),
               error: (e, _) => Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,

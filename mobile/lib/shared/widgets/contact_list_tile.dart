@@ -22,13 +22,16 @@ class ContactListTile extends StatelessWidget {
     return Card(
       margin: EdgeInsets.zero,
       child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: theme.colorScheme.primaryContainer,
-          child: Text(
-            _initials(contact.fullName),
-            style: TextStyle(
-              color: theme.colorScheme.onPrimaryContainer,
-              fontWeight: FontWeight.bold,
+        leading: Hero(
+          tag: 'contact-avatar-${contact.id}',
+          child: CircleAvatar(
+            backgroundColor: theme.colorScheme.primaryContainer,
+            child: Text(
+              _initials(contact.fullName),
+              style: TextStyle(
+                color: theme.colorScheme.onPrimaryContainer,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
