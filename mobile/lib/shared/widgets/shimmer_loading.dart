@@ -39,7 +39,7 @@ class _ShimmerBoxState extends State<ShimmerBox>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final baseColor = theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5);
+    final baseColor = theme.colorScheme.surfaceVariant.withOpacity(0.5);
     final highlightColor = theme.colorScheme.surface;
 
     return AnimatedBuilder(
@@ -114,8 +114,8 @@ class _ShimmerTileState extends State<_ShimmerTile>
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final baseColor = theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4);
-    final highlightColor = theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.1);
+    final baseColor = theme.colorScheme.surfaceVariant.withOpacity(0.4);
+    final highlightColor = theme.colorScheme.surfaceVariant.withOpacity(0.1);
 
     return AnimatedBuilder(
       animation: _controller,
