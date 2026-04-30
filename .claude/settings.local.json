@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc -l /d/projects/Networkhub/backend/app/repositories/*.py)",
+      "Bash(find /d/projects/Networkhub/backend/app -name \"*.py\" -exec wc -l {} +)",
+      "Bash(xargs grep:*)",
+      "Bash(find /d/projects/Networkhub/mobile -type f \\\\\\(-name *fixture* -o -name *mock* -o -name *helper* \\\\\\))",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(ls -la .venv/Scripts/pytest*)",
+      "Bash(pip install:*)",
+      "Bash(python -c \"from app.main import app; print\\(''Backend imports OK''\\)\")",
+      "Bash(python -c \"from app.schemas.event import EventCreate, EventUpdate, EventResponse; print\\(''Event schemas OK''\\)\")",
+      "Bash(python -c \"from app.api.routes.events import router; print\\(f''Event routes: {len\\(router.routes\\)} endpoints''\\); [print\\(f''  {r.methods} {r.path}''\\) for r in router.routes]\")",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter test:*)",
+      "Bash(ruff check:*)"
+    ]
+  }
+}
