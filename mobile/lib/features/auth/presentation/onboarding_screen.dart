@@ -90,8 +90,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
-                  const Gap(32),
+                  const Gap(24),
                   if (_currentStep == 0) ...[
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.asset(
+                        'assets/images/onboarding_hero.png',
+                        height: 160,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const Gap(24),
                     Text(
                       'What\'s your name?',
                       style: theme.textTheme.headlineSmall?.copyWith(

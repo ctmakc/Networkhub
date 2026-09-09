@@ -51,7 +51,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Gap(60),
+                const Gap(48),
+                Image.asset(
+                  'assets/images/logo_mark.png',
+                  height: 72,
+                  width: 72,
+                ),
+                const Gap(16),
                 Text(
                   'NetworkHub',
                   style: theme.textTheme.headlineLarge?.copyWith(
